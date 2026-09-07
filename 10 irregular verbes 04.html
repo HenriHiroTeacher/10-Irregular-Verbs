@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>10 Irregular Verbs Evaluation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            color: #333;
+        }
+
+        .header-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .header-info input {
+            border: none;
+            border-bottom: 1px solid #000;
+            outline: none;
+            font-size: 1em;
+            padding: 2px 5px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 25px;
+        }
+
+        th, td {
+            border: 1px solid #000;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+        input[type="text"] {
+            width: 90%;
+            padding: 6px;
+            text-align: center;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .given-word {
+            font-weight: bold;
+            background-color: #e9ecef;
+            display: block;
+            padding: 6px;
+            border-radius: 4px;
+        }
+
+        .correct {
+            background-color: #d4edda !important;
+            border-color: #c3e6cb !important;
+            color: #155724;
+        }
+
+        .incorrect {
+            background-color: #f8d7da !important;
+            border-color: #f5c6cb !important;
+            color: #721c24;
+        }
+
+        .btn-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 12px 24px;
+            font-size: 1em;
+            font-weight: bold;
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #003d80;
+        }
+
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.65;
+        }
+
+        .acquired {
+            background-color: #d4edda;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-info">
+        <div>Name: <input type="text" id="student-name" placeholder="................................"></div>
+        <div>Class: <input type="text" id="student-class" placeholder="................"></div>
+    </div>
+
+    <h1>10 Irregular Verbs</h1>
+
+    <!-- Tableau d'évaluation des compétences (sous-titres retirés) -->
+    <table id="score-table">
+        <thead>
+            <tr>
+                <th>Note / 10</th>
+                <th>Acquis</th>
+                <th>EN COURS d’acquisition</th>
+                <th>NON acquis</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td id="final-note" style="font-weight: bold; font-size: 1.2em;">--</td>
+                <td id="status-acquis"></td>
+                <td id="status-encours"></td>
+                <td id="status-nonacquis"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p style="font-weight: bold;">Complète le tableau des 10 verbes irréguliers :</p>
+
+    <table id="verbs-table">
+        <thead>
+            <tr>
+                <th>Infinitif</th>
+                <th>Prétérit</th>
+                <th>Participe-passé</th>
+                <th>Traduction</th>
+            </tr>
+        </thead>
+        <tbody id="verbs-body">
+        </tbody>
+    </table>
+
+    <div class="btn-container">
+        <button id="submit-btn" onclick="correctEvaluation()">Corriger l'évaluation</button>
+    </div>
+
+    <script>
+        // Données des 10 verbes
+        const verbsData = [
+            { answers: ["be", "was/were", "been", "être"], alt: ["was / were", "was, were", "was"] },
+            { answers: ["choose", "chose", "chosen", "choisir"], alt: [] },
+            { answers: ["come", "came", "come", "venir"], alt: [] },
+            { answers: ["do", "did", "done", "faire"], alt: [] },
+            { answers: ["have", "had", "had", "avoir"], alt: [] },
+            { answers: ["go", "went", "gone", "aller"], alt: [] },
+            { answers: ["learn", "learnt", "learnt", "apprendre"], alt: [] },
+            { answers: ["think", "thought", "thought", "penser"], alt: [] },
+            { answers: ["understand", "understood", "understood", "comprendre"], alt: [] },
+            { answers: ["write", "wrote", "written", "écrire"], alt: [] }
+        ];
+
+        const givenIndices = [];
+
+        function initTable() {
+            const tbody = document.getElementById("verbs-body");
+            tbody.innerHTML = "";
+
+            verbsData.forEach((verb, rowIndex) => {
+                const tr = document.createElement("tr");
+                
+                const randomIndex = Math.floor(Math.random() * 4);
+                givenIndices.push(randomIndex);
+
+                for (let colIndex = 0; colIndex < 4; colIndex++) {
+                    const td = document.createElement("td");
+                    
+                    if (colIndex === randomIndex) {
+                        td.innerHTML = `<span class="given-word">${verb.answers[colIndex].toUpperCase()}</span>`;
+                    } else {
+                        const input = document.createElement("input");
+                        input.type = "text";
+                        input.dataset.row = rowIndex;
+                        input.dataset.col = colIndex;
+                        input.autocomplete = "off";
+                        input.setAttribute("autocorrect", "off");
+                        input.setAttribute("autocapitalize", "off");
+                        td.appendChild(input);
+                    }
+                    tr.appendChild(td);
+                }
+                tbody.appendChild(tr);
+            });
+        }
+
+        function checkAnswer(userAnswer, expectedAnswer, rowIndex, colIndex) {
+            const cleanUser = userAnswer.trim().toLowerCase();
+            const cleanExpected = expectedAnswer.trim().toLowerCase();
+
+            if (cleanUser === cleanExpected) return true;
+
+            if (rowIndex === 0 && colIndex === 1) {
+                const validVariants = ["was/were", "was / were", "was, were", "was,were", "was", "were"];
+                if (validVariants.includes(cleanUser)) return true;
+            }
+
+            return false;
+        }
+
+        function correctEvaluation() {
+            alert("Correction de l'évaluation et comptage des points en cours...");
+
+            let rawScore = 0; // Score sur 30
+
+            const inputs = document.querySelectorAll("#verbs-body input");
+            
+            inputs.forEach(input => {
+                const row = parseInt(input.dataset.row);
+                const col = parseInt(input.dataset.col);
+                const expected = verbsData[row].answers[col];
+                const userVal = input.value;
+
+                if (checkAnswer(userVal, expected, row, col)) {
+                    rawScore++;
+                    input.classList.add("correct");
+                    input.classList.remove("incorrect");
+                } else {
+                    input.classList.add("incorrect");
+                    input.classList.remove("correct");
+                }
+                
+                input.disabled = true;
+            });
+
+            // Calcul de la note sur 10 (arrondie au demi-point ou au point le plus proche)
+            const noteSur10 = Math.round((rawScore / 30) * 10);
+
+            // Affichage direct de la note seule sous "Note / 10"
+            document.getElementById("final-note").innerText = noteSur10;
+
+            document.getElementById("status-acquis").classList.remove("acquired");
+            document.getElementById("status-encours").classList.remove("acquired");
+            document.getElementById("status-nonacquis").classList.remove("acquired");
+
+            document.getElementById("status-acquis").innerText = "";
+            document.getElementById("status-encours").innerText = "";
+            document.getElementById("status-nonacquis").innerText = "";
+
+            if (noteSur10 >= 9) {
+                const cell = document.getElementById("status-acquis");
+                cell.classList.add("acquired");
+                cell.innerText = "✓ Validé";
+            } else if (noteSur10 >= 1) {
+                const cell = document.getElementById("status-encours");
+                cell.classList.add("acquired");
+                cell.innerText = "✓ En cours";
+            } else {
+                const cell = document.getElementById("status-nonacquis");
+                cell.classList.add("acquired");
+                cell.innerText = "✓ Non acquis";
+            }
+
+            const btn = document.getElementById("submit-btn");
+            btn.disabled = true;
+        }
+
+        window.onload = initTable;
+    </script>
+</body>
+</html>
